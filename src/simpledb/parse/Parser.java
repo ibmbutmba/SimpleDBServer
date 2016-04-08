@@ -23,13 +23,16 @@ public class Parser {
         return lex.eatId();
     }
 
-    public Constant constant() {
-        if ( lex.matchStringConstant() ) {
-            return new StringConstant( lex.eatStringConstant() );
-        } else {
-            return new IntConstant( lex.eatIntConstant() );
-        }
-    }
+    
+   public Constant constant() {
+      if (lex.matchStringConstant())
+         return new StringConstant(lex.eatStringConstant());
+      else if(lex.matchIntConstant())
+          return new IntConstant(lex.eatIntConstant());
+      else{
+         return (Constant) new BoolConstant(lex.eatBooleanConstant());
+      }
+   }
 
     public Expression expression() {
         if ( lex.matchId() ) {
