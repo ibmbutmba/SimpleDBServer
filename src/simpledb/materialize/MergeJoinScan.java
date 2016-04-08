@@ -126,6 +126,15 @@ public class MergeJoinScan implements Scan {
          return s2.getString(fldname);
    }
    
+   
+    @Override
+    public boolean getBoolean( String fldname ) {
+    if (s1.hasField(fldname))
+         return s1.getBoolean(fldname);
+      else
+         return s2.getBoolean(fldname);
+    }
+   
    /**
     * Returns true if the specified field is in
     * either of the underlying scans.

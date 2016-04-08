@@ -40,6 +40,7 @@ public class Planner {
     * @return an integer denoting the number of affected records
     */
    public int executeUpdate(String cmd, Transaction tx) {
+      System.out.println( "planner.Planner executeUpdate triggered - String : " + cmd );
       Parser parser = new Parser(cmd);
       Object obj = parser.updateCmd();
       if (obj instanceof InsertData)

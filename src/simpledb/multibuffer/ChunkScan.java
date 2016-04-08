@@ -96,6 +96,11 @@ public class ChunkScan implements Scan {
       return rp.getString(fldname);
    }
    
+    @Override
+    public boolean getBoolean( String fldname ) {
+       return rp.getBoolean(fldname); 
+    }
+   
    /**
     * @see simpledb.query.Scan#hasField(java.lang.String)
     */

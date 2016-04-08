@@ -116,6 +116,11 @@ public class GroupByScan implements Scan {
       return (String)getVal(fldname).asJavaVal();
    }
    
+    @Override
+    public boolean getBoolean( String fldname ) {
+        return (Boolean)getVal(fldname).asJavaVal();
+    }
+   
    /* Returns true if the specified field is either a 
     * grouping field or created by an aggregation function.
     * @see simpledb.query.Scan#hasField(java.lang.String)

@@ -95,6 +95,11 @@ public class MultiBufferProductScan implements Scan {
       return prodscan.getString(fldname);
    }
    
+    @Override
+    public boolean getBoolean( String fldname ) {
+        return prodscan.getBoolean(fldname);
+    }
+   
    /**
     * Returns true if the specified field is in
     * either of the underlying scans.

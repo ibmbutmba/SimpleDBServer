@@ -28,6 +28,8 @@ public interface UpdateScan extends Scan {
     */
    public void setString(String fldname, String val);
    
+   public void setBoolean(String fldname, boolean val);
+   
    /**
     * Inserts a new record somewhere in the scan.
     */

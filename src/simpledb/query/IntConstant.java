@@ -15,6 +15,7 @@ public class IntConstant implements Constant {
       val = new Integer(n);
    }
    
+   
    /**
     * Unwraps the Integer and returns it.
     * @see simpledb.query.Constant#asJavaVal()

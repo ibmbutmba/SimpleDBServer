@@ -119,6 +119,10 @@ public class SortScan implements Scan {
       return currentscan.getString(fldname);
    }
    
+    public boolean getBoolean( String fldname ) {
+        return currentscan.getBoolean(fldname);
+    }
+   
    /**
     * Returns true if the specified field is in the current scan.
     * @see simpledb.query.Scan#hasField(java.lang.String)

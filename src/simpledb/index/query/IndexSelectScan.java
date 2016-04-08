@@ -89,6 +89,14 @@ public class IndexSelectScan implements Scan {
    }
    
    /**
+    * Returns the value of the field of the current data record.
+    * @see simpledb.query.Scan#getString(java.lang.String)
+    */
+   public boolean getBoolean(String fldname) {
+      return ts.getBoolean(fldname);
+   }
+   
+   /**
     * Returns whether the data record has the specified field.
     * @see simpledb.query.Scan#hasField(java.lang.String)
     */

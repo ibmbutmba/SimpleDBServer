@@ -26,6 +26,7 @@ public class SimpleStatement extends StatementAdapter {
    }
    
    public int executeUpdate(String cmd) throws SQLException {
+      System.out.println( "remote.SimpleStatement executeUpdate triggered - String : " + cmd );
       try {
          return rstmt.executeUpdate(cmd);
       }

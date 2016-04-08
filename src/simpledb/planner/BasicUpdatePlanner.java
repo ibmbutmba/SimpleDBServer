@@ -53,6 +53,7 @@ public class BasicUpdatePlanner implements UpdatePlanner {
    }
    
    public int executeCreateTable(CreateTableData data, Transaction tx) {
+       System.out.println( "planner.BasicUpdatePlanner inserts DB !" );
       SimpleDB.mdMgr().createTable(data.tableName(), data.newSchema(), tx);
       return 0;
    }

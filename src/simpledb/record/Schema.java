@@ -54,6 +54,11 @@ public class Schema {
       addField(fldname, VARCHAR, length);
    }
    
+   public void addBooleanField(String fldname, int length) {
+       System.out.println( "record.Schema boolean called : fldname : " + fldname + " length : " + length );
+      addField(fldname, BOOLEAN, length);
+   }
+   
    /**
     * Adds a field to the schema having the same
     * type and length as the corresponding field
@@ -102,7 +107,6 @@ public class Schema {
     * @return the integer type of the field
     */
    public int type(String fldname) {
-       System.out.println( "Field name : " + fldname );
       return info.get(fldname).type;
    }
    

@@ -57,6 +57,13 @@ public class ProjectScan implements Scan {
          throw new RuntimeException("field " + fldname + " not found.");
    }
    
+    public boolean getBoolean(String fldname) {
+      if (hasField(fldname))
+         return s.getBoolean(fldname);
+      else
+         throw new RuntimeException("field " + fldname + " not found.");
+   }
+   
    /**
     * Returns true if the specified field
     * is in the projection list.

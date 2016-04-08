@@ -18,6 +18,7 @@ public class MetadataMgr {
    }
    
    public void createTable(String tblname, Schema sch, Transaction tx) {
+       System.out.println( "metadata.MetadarMng says : tblName : " + tblname );
       tblmgr.createTable(tblname, sch, tx);
    }
    
