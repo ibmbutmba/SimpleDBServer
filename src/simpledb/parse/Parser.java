@@ -12,9 +12,11 @@ import simpledb.record.Schema;
 public class Parser {
 
     private Lexer lex;
+    private String query;
 
     public Parser( String s ) {
         System.out.println( "Content of query : " + s );
+        query = s;
         lex = new Lexer( s );
     }
 
@@ -29,9 +31,7 @@ public class Parser {
          return new StringConstant(lex.eatStringConstant());
       else if(lex.matchIntConstant())
           return new IntConstant(lex.eatIntConstant());
-      else{
-         return (Constant) new BoolConstant(lex.eatBooleanConstant());
-      }
+      return null;
    }
 
     public Expression expression() {
@@ -131,6 +131,7 @@ public class Parser {
 
 // Methods for parsing insert commands
     public InsertData insert() {
+        
         lex.eatKeyword( "insert" );
         lex.eatKeyword( "into" );
         String tblname = lex.eatId();
@@ -138,8 +139,9 @@ public class Parser {
         List<String> flds = fieldList();
         lex.eatDelim( ')' );
         lex.eatKeyword( "values" );
-        lex.eatDelim( '(' );
+        lex.eatDelim( '(' );    
         List<Constant> vals = constList();
+        //replaceBoolean(vals);
         lex.eatDelim( ')' );
         return new InsertData( tblname, flds, vals );
     }
@@ -244,5 +246,5 @@ public class Parser {
         String fldname = field();
         lex.eatDelim( ')' );
         return new CreateIndexData( idxname, tblname, fldname );
-    }
+    }    
 }

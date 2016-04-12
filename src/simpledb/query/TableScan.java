@@ -16,7 +16,9 @@ public class TableScan implements UpdateScan {
 
     private RecordFile rf;
     private Schema sch;
-
+    
+    private int intVal;
+            
     /**
      * Creates a new table scan, and opens its corresponding record file.
      *
@@ -101,7 +103,11 @@ public class TableScan implements UpdateScan {
 
     public void setBoolean( String fldname, boolean val ) {
         System.out.println( "query.Tablescan says : setBoolean( String : " + fldname + ", bool :" + val + " )" );
-        rf.setBoolean( fldname, val );
+        if(val== true){
+            intVal= 1;
+        }
+        intVal= 0;
+        rf.setInt(fldname, intVal );
     }
 
     public void delete() {

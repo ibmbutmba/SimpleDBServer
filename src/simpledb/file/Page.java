@@ -173,12 +173,17 @@ public class Page {
         System.out.println( "file.Page says : getBoolean( position : " + position + " )" );
         contents.position( position );
         int len = contents.getInt();
-        byte[] byteval = new byte[ len ];
+        System.out.println( "file.Page says : returning boolean int : " + len );
+        System.out.println( "file.Page says : returning boolean : " + len );
+        if (len== 1){
+            return true;
+        }
+        return false;
+        
+       /* byte[] byteval = new byte[ len ];
         contents.get( byteval );
-        String booleanString = new String( byteval );
-        System.out.println( "file.Page says : returning boolean string : " + booleanString );
-        System.out.println( "file.Page says : returning boolean : " + new Boolean ( booleanString ) );
-        return new Boolean( booleanString );
+        String booleanString = new String( byteval ); */
+        //return new Boolean( booleanString );
     }
 
     public void setBoolean( int offset, boolean val ) {
