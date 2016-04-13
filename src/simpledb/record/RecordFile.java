@@ -126,8 +126,8 @@ public class RecordFile {
      * @param val the new value for the field
      */
     public void setBoolean( String fldname, boolean val ) {
-        System.out.println( "record.RecordFile says : setBoolean( String : " + fldname + ", bool :" + val + " )" );
-        rp.setBoolean( fldname, val );
+        int boolInt = val ? 1 : 0;
+        setInt(fldname, boolInt);
     }
 
     /**

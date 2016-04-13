@@ -139,4 +139,11 @@ public class FileMgr {
       }
       return fc;
    }
+   
+       public void close() throws IOException {
+        for (FileChannel fc : openFiles.values()) {
+            fc.close();
+        }
+        openFiles.clear();
+    }
 }

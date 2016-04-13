@@ -16,17 +16,17 @@ public class TableScan implements UpdateScan {
 
     private RecordFile rf;
     private Schema sch;
-    
+
     private int intVal;
-            
+
     /**
      * Creates a new table scan, and opens its corresponding record file.
      *
      * @param ti the table's metadata
      * @param tx the calling transaction
      */
-    public TableScan( TableInfo ti, Transaction tx ) {
-        rf = new RecordFile( ti, tx );
+    public TableScan(TableInfo ti, Transaction tx) {
+        rf = new RecordFile(ti, tx);
         sch = ti.schema();
     }
 
@@ -51,29 +51,34 @@ public class TableScan implements UpdateScan {
      *
      * @see simpledb.query.Scan#getVal(java.lang.String)
      */
-    public Constant getVal( String fldname ) {
-        if ( sch.type( fldname ) == INTEGER ) {
-            return new IntConstant( rf.getInt( fldname ) );
+    public Constant getVal(String fldname) {
+        if (sch.type(fldname) == INTEGER) {
+            return new IntConstant(rf.getInt(fldname));
         } else {
-            return new StringConstant( rf.getString( fldname ) );
+            return new StringConstant(rf.getString(fldname));
         }
     }
 
-    public int getInt( String fldname ) {
-        return rf.getInt( fldname );
+    public int getInt(String fldname) {
+        return rf.getInt(fldname);
     }
 
-    public String getString( String fldname ) {
-        return rf.getString( fldname );
+    public String getString(String fldname) {
+        return rf.getString(fldname);
     }
 
-    public boolean getBoolean( String fldname ) {
-        System.out.println( "query.Tablescan says : getBoolean( String : " + fldname + " )" );
-        return rf.getBoolean( fldname );
+    public boolean getBoolean(String fldname) {
+        System.out.println("query.Tablescan says : getBoolean( String : " + fldname + " )");
+        boolean pinkColor = true;
+        int valueBack = getInt(fldname);
+        if (valueBack == 0) {
+            pinkColor = false;
+        }
+        return pinkColor;
     }
 
-    public boolean hasField( String fldname ) {
-        return sch.hasField( fldname );
+    public boolean hasField(String fldname) {
+        return sch.hasField(fldname);
     }
 
     /**
@@ -85,29 +90,29 @@ public class TableScan implements UpdateScan {
      * @see simpledb.query.UpdateScan#setVal(java.lang.String,
      * simpledb.query.Constant)
      */
-    public void setVal( String fldname, Constant val ) {
-        if ( sch.type( fldname ) == INTEGER ) {
-            rf.setInt( fldname, ( Integer ) val.asJavaVal() );
+    public void setVal(String fldname, Constant val) {
+        if (sch.type(fldname) == INTEGER) {
+            rf.setInt(fldname, (Integer) val.asJavaVal());
         } else {
-            rf.setString( fldname, ( String ) val.asJavaVal() );
+            rf.setString(fldname, (String) val.asJavaVal());
         }
     }
 
-    public void setInt( String fldname, int val ) {
-        rf.setInt( fldname, val );
+    public void setInt(String fldname, int val) {
+        rf.setInt(fldname, val);
     }
 
-    public void setString( String fldname, String val ) {
-        rf.setString( fldname, val );
+    public void setString(String fldname, String val) {
+        rf.setString(fldname, val);
     }
 
-    public void setBoolean( String fldname, boolean val ) {
-        System.out.println( "query.Tablescan says : setBoolean( String : " + fldname + ", bool :" + val + " )" );
-        if(val== true){
-            intVal= 1;
+    public void setBoolean(String fldname, boolean val) {
+        System.out.println("query.Tablescan says : setBoolean( String : " + fldname + ", bool :" + val + " )");
+        if (val == true) {
+            intVal = 1;
         }
-        intVal= 0;
-        rf.setInt(fldname, intVal );
+        intVal = 0;
+        rf.setInt(fldname, intVal);
     }
 
     public void delete() {
@@ -122,7 +127,7 @@ public class TableScan implements UpdateScan {
         return rf.currentRid();
     }
 
-    public void moveToRid( RID rid ) {
-        rf.moveToRid( rid );
+    public void moveToRid(RID rid) {
+        rf.moveToRid(rid);
     }
 }
