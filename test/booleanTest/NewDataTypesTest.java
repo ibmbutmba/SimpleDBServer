@@ -20,7 +20,7 @@ import simpledb.tx.Transaction;
  *
  * @author artur
  */
-public class MyTest {
+public class NewDataTypesTest {
 
     static Transaction tx;
     static final String tableName = "STUDENTTEST";
@@ -29,7 +29,7 @@ public class MyTest {
     private TableScan ts;
     private static Schema schema;
 
-    public MyTest() {
+    public NewDataTypesTest() {
     }
 
     @BeforeClass
@@ -42,6 +42,7 @@ public class MyTest {
         schema.addIntField("SId");
         schema.addStringField("Sname", 20);
         schema.addBooleanField("Sbool");
+        schema.addFloatField("gradeAverage");
         SimpleDB.mdMgr().createTable(tableName, schema, tx);
         TableInfo tableInfo = SimpleDB.mdMgr().getTableInfo(tableName, tx);
         RecordFile file = new RecordFile(tableInfo, tx);
@@ -50,6 +51,7 @@ public class MyTest {
         file.setInt("SId", 1);
         file.setString("Sname", "Boyko");
         file.setBoolean("Sbool", true);
+        file.setFloat("gradeAverage", 67.94f);
 
         tx.commit();
     }
@@ -59,7 +61,6 @@ public class MyTest {
         SimpleDB.dropDatabase(dbName);
     }
 
-    @Before
     public void setUp() {
     }
 
@@ -75,7 +76,6 @@ public class MyTest {
         ts.beforeFirst();
         ts.next();
         
-        System.out.println("blblbllbl " + ts.getInt("SId"));
         assertEquals(ts.getInt("SId"), 1);
     }
     
@@ -89,4 +89,14 @@ public class MyTest {
         assertEquals(ts.getBoolean("Sbool"), true);
     }
 
+        @Test
+    public void testFloatGetDataBack() {
+        ti = new TableInfo(tableName, schema);
+        ts = new TableScan(ti, tx);
+        ts.beforeFirst();
+        ts.next();
+        
+        assertEquals(67.94f, ts.getFloat("gradeAverage"), 0.0001);
+    }
+    
 }

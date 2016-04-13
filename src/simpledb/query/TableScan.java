@@ -77,6 +77,11 @@ public class TableScan implements UpdateScan {
         return pinkColor;
     }
 
+    public float getFloat(String fldname) {      
+        float floatValue = Float.parseFloat(getString(fldname));
+        return floatValue;
+    }
+
     public boolean hasField(String fldname) {
         return sch.hasField(fldname);
     }

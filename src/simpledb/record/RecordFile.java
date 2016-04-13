@@ -129,6 +129,11 @@ public class RecordFile {
         int boolInt = val ? 1 : 0;
         setInt(fldname, boolInt);
     }
+    
+    public void setFloat( String fldname, float val ) {
+        String floatString = ""+ val;
+        setString(fldname, floatString);
+    }
 
     /**
      * Deletes the current record. The client must call next() to move to the

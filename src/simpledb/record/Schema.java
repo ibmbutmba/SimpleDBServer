@@ -59,6 +59,11 @@ public class Schema {
       addField(fldname, INTEGER, 0);
    }
    
+    public void addFloatField(String fldname) {
+       //System.out.println( "record.Schema boolean called : fldname : " + fldname + " length : " + length );
+      addField(fldname, VARCHAR, 20);
+   }
+   
    /**
     * Adds a field to the schema having the same
     * type and length as the corresponding field
