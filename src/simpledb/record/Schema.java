@@ -55,12 +55,10 @@ public class Schema {
    }
    
    public void addBooleanField(String fldname) {
-       //System.out.println( "record.Schema boolean called : fldname : " + fldname + " length : " + length );
       addField(fldname, INTEGER, 0);
    }
    
     public void addFloatField(String fldname) {
-       //System.out.println( "record.Schema boolean called : fldname : " + fldname + " length : " + length );
       addField(fldname, VARCHAR, 20);
    }
    
@@ -72,7 +70,6 @@ public class Schema {
     * @param sch the other schema
     */
    public void add(String fldname, Schema sch) {
-       System.out.println("Schema add - fldname : " + fldname + " and schema is : " + sch.toString());
       int type   = sch.type(fldname);
       int length = sch.length(fldname);
       addField(fldname, type, length);
@@ -113,7 +110,6 @@ public class Schema {
     * @return the integer type of the field
     */
    public int type(String fldname) {
-       System.out.println("Schema client, fieldname" + fldname);
       return info.get(fldname).type;
    }
    

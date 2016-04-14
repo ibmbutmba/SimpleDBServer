@@ -3,11 +3,9 @@ package booleanTest;
 import java.io.IOException;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import simpledb.metadata.TableMgr;
 import simpledb.query.TableScan;
 import simpledb.record.RecordFile;
 import simpledb.record.Schema;
@@ -17,9 +15,9 @@ import simpledb.tx.Transaction;
 
 /**
  *
- * @author artur
+ * @author mady
  */
-public class NewDataTypesTest {
+public class NoDupsTest {
 
     static Transaction tx;
     static final String tableName = "STUDENTTEST";
@@ -28,20 +26,17 @@ public class NewDataTypesTest {
     private TableScan ts;
     private static Schema schema;
 
-    public NewDataTypesTest() {
+    public NoDupsTest() {
     }
 
     @BeforeClass
     public static void setUpClass() {
-
         SimpleDB.init(dbName);
         tx = new Transaction();
 
         schema = new Schema();
         schema.addIntField("SId");
         schema.addStringField("Sname", 20);
-        schema.addBooleanField("Sbool");
-        schema.addFloatField("gradeAverage");
         SimpleDB.mdMgr().createTable(tableName, schema, tx);
         TableInfo tableInfo = SimpleDB.mdMgr().getTableInfo(tableName, tx);
         RecordFile file = new RecordFile(tableInfo, tx);
@@ -49,9 +44,12 @@ public class NewDataTypesTest {
         file.insert();
         file.setInt("SId", 1);
         file.setString("Sname", "Boyko");
-        file.setBoolean("Sbool", true);
-        file.setFloat("gradeAverage", 67.94f);
 
+        file.setInt("SId", 1);
+        file.setString("Sname", "Boyko");
+
+        file.setInt("SId", 5);
+        file.setString("Sname", "Dani");
         tx.commit();
     }
 
@@ -75,27 +73,7 @@ public class NewDataTypesTest {
         ts.beforeFirst();
         ts.next();
 
-        assertEquals(ts.getInt("SId"), 1);
+        assertEquals(5, ts.getInt("SId"));
+        assertEquals("Dani", ts.getString("Sname"));
     }
-
-    @Test
-    public void testGetBooleanBack() {
-        ti = new TableInfo(tableName, schema);
-        ts = new TableScan(ti, tx);
-        ts.beforeFirst();
-        ts.next();
-
-        assertEquals(ts.getBoolean("Sbool"), true);
-    }
-
-    @Test
-    public void testFloatGetDataBack() {
-        ti = new TableInfo(tableName, schema);
-        ts = new TableScan(ti, tx);
-        ts.beforeFirst();
-        ts.next();
-
-        assertEquals(67.94f, ts.getFloat("gradeAverage"), 0.0001);
-    }
-
 }
