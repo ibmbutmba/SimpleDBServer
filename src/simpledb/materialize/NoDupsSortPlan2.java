@@ -11,12 +11,14 @@ import java.util.*;
  *
  * @author Edward Sciore
  */
-public class SortPlan implements Plan {
+public class NoDupsSortPlan2 implements Plan {
 
     private Plan p;
     private Transaction tx;
     private Schema sch;
     private RecordComparator comp;
+    private String sortBy = null;
+    private List<String> fields;
 
     /**
      * Creates a sort plan for the specified query.
@@ -25,11 +27,21 @@ public class SortPlan implements Plan {
      * @param sortfields the fields to sort by
      * @param tx the calling transaction
      */
-    public SortPlan(Plan p, List<String> sortfields, Transaction tx) {
+    public NoDupsSortPlan2(Plan p, List<String> sortfields, Transaction tx, String sortby) {
         this.p = p;
         this.tx = tx;
         sch = p.schema();
         comp = new RecordComparator(sortfields);
+        fields = sortfields;
+        this.sortBy = sortby;
+    }
+
+    public void setSortBy(String sortBy) {
+        this.sortBy = sortBy;
+    }
+
+    public String getSortBy() {
+        return sortBy;
     }
 
     /**
@@ -100,13 +112,25 @@ public class SortPlan implements Plan {
         TempTable currenttemp = new TempTable(sch, tx);
         temps.add(currenttemp);
         UpdateScan currentScan = currenttemp.open();
+        int value = 0;
         while (copy(scan, currentScan)) {
-            if (comp.compare(scan, currentScan) < 0) {
+
+            if (getSortBy() == null) {
+                value = comp.compare(scan, currentScan);
+            } else {
+                value = compare(scan, currentScan);
+            }
+            System.out.println("value is : " + value);
+            if (value < 0) {
                 // start a new run
                 currentScan.close();
                 currenttemp = new TempTable(sch, tx);
                 temps.add(currenttemp);
                 currentScan = (UpdateScan) currenttemp.open();
+            } else if ( value == 0) {
+                currentScan = (UpdateScan) currenttemp.open();
+                scan.next();
+                System.out.println("PLEASE REMVOE ME!!!!!");
             }
         }
         currentScan.close();
@@ -134,18 +158,27 @@ public class SortPlan implements Plan {
 
         boolean hasmore1 = src1.next();
         boolean hasmore2 = src2.next();
+        int value = 0;
         while (hasmore1 && hasmore2) {
-            System.out.println("Hey you : " + comp.compare(src1, src2));
-            System.out.println("src1 " + src1.getVal("Sname") + ", src2 " + src2.getVal("Sname"));
-            int solution = comp.compare(src1, src2);
-            //http://www.leepoint.net/data/expressions/22compareobjects.html
-//            if (solution != 0) {
-                if (comp.compare(src1, src2) < 0) {
+//            //http://www.leepoint.net/data/expressions/22compareobjects.html
+            System.out.println("P1 " + src1.getVal(getSortBy()) + "sorted by: " + getSortBy());
+            System.out.println("P2 " + src2.getVal(getSortBy()) + "sorted by: " + getSortBy());
+
+            if (getSortBy() == null) {
+                value = comp.compare(src1, src2);
+            } else {
+                value = compare(src1, src2);
+            }
+            System.out.println("value is : " + value);
+            if (value != 0) {
+                if (value < 0) {
                     hasmore1 = copy(src1, dest);
                 } else {
                     hasmore2 = copy(src2, dest);
                 }
-//            }
+            } else {
+                System.out.println("REMOVE THEM!");
+            }
         }
 
         if (hasmore1) {
@@ -157,10 +190,29 @@ public class SortPlan implements Plan {
                 hasmore2 = copy(src2, dest);
             }
         }
+
         src1.close();
+
         src2.close();
+
         dest.close();
         return result;
+    }
+
+    public int compare(Scan s1, Scan s2) {
+        for (String fldname : fields) {
+            if (fldname.equals(getSortBy())) {
+                Constant val1 = s1.getVal(fldname);
+                Constant val2 = s2.getVal(fldname);
+                System.out.println("1 is : " + s1.getVal(fldname));
+                System.out.println("2 is : " + s2.getVal(fldname));
+                int result = val1.compareTo(val2);
+                if (result != 0) {
+                    return result;
+                }
+            }
+        }
+        return 0;
     }
 
     protected boolean copy(Scan scan, UpdateScan newUpdateScanObject) {
