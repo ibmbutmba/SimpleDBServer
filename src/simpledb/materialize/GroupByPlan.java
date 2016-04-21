@@ -28,21 +28,16 @@ public class GroupByPlan implements Plan {
      * @param aggfns the aggregation functions
      * @param tx the calling transaction
      */
-    public GroupByPlan(Plan p, Collection<String> groupfields, Collection<AggregationFn> aggfns, Transaction tx, String sortBy) {
+    public GroupByPlan(Plan p, Collection<String> groupfields, Collection<AggregationFn> aggfns, Transaction tx) {
         
         List<String> columnsList = new ArrayList<String>();
         
         columnsList.addAll(groupfields);
         
-        for (int i = 0; i < columnsList.size(); i++) {
-            System.out.println("# " + i + " : " + columnsList.get(i));
-        }
-        
-        this.p = new NoDupsSortPlan2(p, columnsList, tx, sortBy);
+        this.p = new SortPlan(p, columnsList, tx);
         this.groupfields = groupfields;
         this.aggfns = aggfns;
         for (String fldname : groupfields) {
-            System.out.println("fldname : " + fldname);
             sch.add(fldname, p.schema());
         }
         for (AggregationFn fn : aggfns) {

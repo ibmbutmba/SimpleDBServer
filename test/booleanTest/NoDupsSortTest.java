@@ -13,6 +13,8 @@ import static org.junit.Assert.*;
 import simpledb.materialize.AggregationFn;
 import simpledb.materialize.GroupByPlan;
 import simpledb.materialize.GroupByScan;
+import simpledb.materialize.NoDupsSortPlan;
+import simpledb.materialize.NoDupsSortScan;
 import simpledb.query.Plan;
 import simpledb.query.Predicate;
 import simpledb.query.SelectPlan;
@@ -23,7 +25,7 @@ import simpledb.record.TableInfo;
 import simpledb.server.SimpleDB;
 import simpledb.tx.Transaction;
 
-public class GroupByTest {
+public class NoDupsSortTest {
 
     //Init db
     static final String dbName = "mytestdb";
@@ -33,8 +35,8 @@ public class GroupByTest {
     static final String tableName = "STUDENTTEST";
     private static Schema schema;
 
-    //Group by plan components
-    private static GroupByPlan groupByPlan;
+    //Planner componenets
+    private static NoDupsSortPlan noDupsSortPlan;
     private static SelectPlan selectPlan;
     private static Plan tablePlan;
 
@@ -44,10 +46,11 @@ public class GroupByTest {
     private static List<AggregationFn> aggregationFnList = new ArrayList();
 
     //Sort (filter) elems in table based on curent fields
-    private static List<String> filterOn = Arrays.asList("Sname", "SId");
-    private static GroupByScan groupByScan;
+    private static String distinctFilter = "Sname";
+    private static List<String> filterOn = Arrays.asList( distinctFilter );
     
-    private static String sortBy = "Sname";
+    //Actual scanner
+    private static NoDupsSortScan noDupsSortScan;
 
     //Sorted values (for testing)
     private static List<String> sortedNames = Arrays.asList("Boyko", "Artur", "Cada", "Mada", "Vada");
@@ -78,7 +81,7 @@ public class GroupByTest {
         selectPlan = new SelectPlan(tablePlan, predicate);
 
         //Init group by plan
-        groupByPlan = new GroupByPlan(selectPlan, filterOn, aggregationFnList, transaction, sortBy);
+        noDupsSortPlan = new NoDupsSortPlan(selectPlan, filterOn, transaction);
 
         file.insert();
         file.setInt("SId", 1);
@@ -125,21 +128,18 @@ public class GroupByTest {
     @Test
     public void testGroupBy() {
         //Open
-        groupByScan = (GroupByScan) groupByPlan.open();
+        noDupsSortScan = (NoDupsSortScan) noDupsSortPlan.open();
 
         //Go to 1st
-        groupByScan.beforeFirst();
+        noDupsSortScan.beforeFirst();
 
         //Loop through group by scan results
         int loopId = 0;
-        while (groupByScan.next()) {
-            System.out.println("next " + groupByScan.getVal("SId") + " " + groupByScan.getVal("Sname"));
+        while (noDupsSortScan.next()) {
+            System.out.println("Comparing DB : '" + sortedNames.get(loopId) + "' vs Local : '" + noDupsSortScan.getVal("Sname") + "'");
 
-            //assertEquals(sortedNames.get(loopId), groupByScan.getString("Sname"));
-
+            assertEquals(sortedNames.get(loopId), noDupsSortScan.getString("Sname"));
             loopId++;
         }
-        assertEquals(1 , 1);
-        System.out.println("Distinct values: " + groupByPlan.distinctValues("SId"));
     }
 }

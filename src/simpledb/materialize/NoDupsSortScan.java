@@ -1,23 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package simpledb.materialize;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import simpledb.query.Constant;
 import simpledb.query.Scan;
 import simpledb.query.UpdateScan;
 import simpledb.record.RID;
 
-/**
- *
- * @author mady
- */
 public class NoDupsSortScan implements Scan {
 
     private List<String> indices;
@@ -50,13 +39,6 @@ public class NoDupsSortScan implements Scan {
         }
     }
 
-    /**
-    * Moves to the next record in sorted order.
-    * First, the current scan is moved to the next record.
-    * Then the lowest record of the two scans is found, and that
-    * scan is chosen to be the new current scan.
-    * @see simpledb.query.Scan#next()
-    */
     public boolean next() {
         if (currentscan != null) {
             if (currentscan == s1) {
@@ -70,11 +52,9 @@ public class NoDupsSortScan implements Scan {
         } else if (hasmore1 && hasmore2) {
             if (comp.compare(s1, s2) < 0) {
                 currentscan = s1;
-            } 
-            else if(comp.compare(s1, s2) == 0){
+            } else if (comp.compare(s1, s2) == 0) {
                 removeDuplicate(s2);
-            }
-            else {
+            } else {
                 currentscan = s2;
             }
         } else if (hasmore1) {
@@ -120,19 +100,12 @@ public class NoDupsSortScan implements Scan {
         return false;
     }
 
-    /**
-     * Saves the position of the current record, so that it can be restored at a
-     * later time.
-     */
     public void savePosition() {
         RID rid1 = s1.getRid();
         RID rid2 = (s2 == null) ? null : s2.getRid();
         savedposition = Arrays.asList(rid1, rid2);
     }
 
-    /**
-     * Moves the scan to its previously-saved position.
-     */
     public void restorePosition() {
         RID rid1 = savedposition.get(0);
         RID rid2 = savedposition.get(1);
@@ -141,8 +114,8 @@ public class NoDupsSortScan implements Scan {
             s2.moveToRid(rid2);
         }
     }
-    
-    public void removeDuplicate(UpdateScan uscan){
+
+    public void removeDuplicate(UpdateScan uscan) {
         uscan.delete();
     }
 
