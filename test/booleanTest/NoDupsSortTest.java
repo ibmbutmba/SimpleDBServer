@@ -45,85 +45,89 @@ public class NoDupsSortTest {
 
     //Sort (filter) elems in table based on curent fields
     private static String distinctFilter = "Sname";
-    private static List<String> filterOn = Arrays.asList( distinctFilter );
+    private static List<String> filterOn = Arrays.asList(distinctFilter);
 
     //Actual scanner
     private static NoDupsSortScan noDupsSortScan;
 
     //Sorted values (for testing)
-    private static List<String> sortedNames = Arrays.asList( "AMMMMM", "BZZZZZ", "CEEEEE", "DNNNNN", "EOOOOO", "FLLLLL", "GGGGGG" );
+    private static List<String> sortedNames = Arrays.asList("AMMMMM", "BZZZZZ", "CEEEEE", "DNNNNN", "EOOOOO", "FLLLLL", "GGGGGG");
 
     @BeforeClass
     public static void setUpClass() {
         //Init connection with db
-        SimpleDB.init( dbName );
+        SimpleDB.init(dbName);
 
         //Create a transaction (the activity to do sth)
         transaction = new Transaction();
 
         //Definition of the table structure
         schema = new Schema();
-        schema.addIntField( "SId" );
-        schema.addStringField( "Sname", 20 );
+        schema.addIntField("SId");
+        schema.addStringField("Sname", 20);
 
         //Create a table
-        SimpleDB.mdMgr().createTable( tableName, schema, transaction );
+        SimpleDB.mdMgr().createTable(tableName, schema, transaction);
 
         //Get the table from the manager
-        TableInfo tableInfo = SimpleDB.mdMgr().getTableInfo( tableName, transaction );
+        TableInfo tableInfo = SimpleDB.mdMgr().getTableInfo(tableName, transaction);
         //Manages a file of records
-        RecordFile file = new RecordFile( tableInfo, transaction );
+        RecordFile file = new RecordFile(tableInfo, transaction);
 
         //Components of GroupByPlan 
-        tablePlan = new TablePlan( tableName, transaction );
-        selectPlan = new SelectPlan( tablePlan, predicate );
+        tablePlan = new TablePlan(tableName, transaction);
+        selectPlan = new SelectPlan(tablePlan, predicate);
 
         //Init group by plan
-        noDupsSortPlan = new NoDupsSortPlan( selectPlan, filterOn, transaction );
+        noDupsSortPlan = new NoDupsSortPlan(selectPlan, filterOn, transaction);
 
         file.insert();
-        file.setInt( "SId", 1 );
-        file.setString( "Sname", "AMMMMM" );
+        file.setInt("SId", 1);
+        file.setString("Sname", "AMMMMM");
 
         file.insert();
-        file.setInt( "SId", 2 );
-        file.setString( "Sname", "BZZZZZ" );
+        file.setInt("SId", 2);
+        file.setString("Sname", "BZZZZZ");
 
         file.insert();
-        file.setInt( "SId", 3 );
-        file.setString( "Sname", "CEEEEE" );
+        file.setInt("SId", 3);
+        file.setString("Sname", "CEEEEE");
 
         file.insert();
-        file.setInt( "SId", 4 );
-        file.setString( "Sname", "DNNNNN" );
+        file.setInt("SId", 4);
+        file.setString("Sname", "DNNNNN");
 
         file.insert();
-        file.setInt( "SId", 5 );
-        file.setString( "Sname", "EOOOOO" );
+        file.setInt("SId", 5);
+        file.setString("Sname", "EOOOOO");
 
         file.insert();
-        file.setInt( "SId", 6 );
-        file.setString( "Sname", "CEEEEE" );
+        file.setInt("SId", 6);
+        file.setString("Sname", "CEEEEE");
 
         file.insert();
-        file.setInt( "SId", 7 );
-        file.setString( "Sname", "BZZZZZ" );
+        file.setInt("SId", 7);
+        file.setString("Sname", "BZZZZZ");
 
         file.insert();
-        file.setInt( "SId", 8 );
-        file.setString( "Sname", "AMMMMM" );
+        file.setInt("SId", 8);
+        file.setString("Sname", "AMMMMM");
 
         file.insert();
-        file.setInt( "SId", 9 );
-        file.setString( "Sname", "FLLLLL" );
+        file.setInt("SId", 9);
+        file.setString("Sname", "FLLLLL");
 
         file.insert();
-        file.setInt( "SId", 10 );
-        file.setString( "Sname", "GGGGGG" );
+        file.setInt("SId", 10);
+        file.setString("Sname", "GGGGGG");
 
         file.insert();
-        file.setInt( "SId", 11 );
-        file.setString( "Sname", "BZZZZZ" );
+        file.setInt("SId", 11);
+        file.setString("Sname", "BZZZZZ");
+
+        file.insert();
+        file.setInt("SId", 9);
+        file.setString("Sname", "FLLLLL");
 
         //commit
         transaction.commit();
@@ -131,7 +135,7 @@ public class NoDupsSortTest {
 
     @AfterClass
     public static void tearDownClass() throws IOException {
-        SimpleDB.dropDatabase( dbName );
+        SimpleDB.dropDatabase(dbName);
     }
 
     @Before
@@ -146,17 +150,17 @@ public class NoDupsSortTest {
     @Test
     public void testGroupBy() {
         //Open
-        noDupsSortScan = ( NoDupsSortScan ) noDupsSortPlan.open();
+        noDupsSortScan = (NoDupsSortScan) noDupsSortPlan.open();
 
         //Go to 1st
         noDupsSortScan.beforeFirst();
 
-        //Loop through group by scan results
+//        Loop through group by scan results
         int loopId = 0;
-        while ( noDupsSortScan.next() ) {
-            System.out.println( "Comparing DB : '" + noDupsSortScan.getVal( "Sname" ) + "' vs Predictions : '" + sortedNames.get( loopId ) + "'" );
+        while (noDupsSortScan.next()) {
+            System.out.println("Comparing DB : '" + noDupsSortScan.getVal("Sname") + "' vs Predictions : '" + sortedNames.get(loopId) + "'");
 
-            assertEquals( sortedNames.get( loopId ), noDupsSortScan.getString( "Sname" ) );
+            assertEquals(sortedNames.get(loopId), noDupsSortScan.getString("Sname"));
             loopId++;
         }
     }

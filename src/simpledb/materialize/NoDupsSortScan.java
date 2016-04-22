@@ -53,23 +53,25 @@ public class NoDupsSortScan implements Scan {
 //            System.out.println("In the no dups sort scan "+ s1.getVal("Sname")+ " "+ s2.getVal("Sname"));
             if (comp.compare(s1, s2) < 0) {
                 currentscan = s1;
-//            } else if (comp.compare(s1, s2) == 0) {
-////                System.out.println("Here we have equality: " + " "
-////                        + s1.getInt("SId") + " "
-////                        + s1.getString("Sname") + " "
-////                        + s2.getInt("SId") + " "
-////                        + s2.getString("Sname"));
-//                s1.next();
-//                currentscan = s2;
-////                removeDuplicate(s2);
-            } else {
-                hasmore1= s1.next();
+            } else if (comp.compare(s1, s2) == 0) {
+//                System.out.println("Here we have equality: " + " "
+//                        + s1.getInt("SId") + " "
+//                        + s1.getString("Sname") + " "
+//                        + s2.getInt("SId") + " "
+//                        + s2.getString("Sname"));
+                s1.next();
                 currentscan = s2;
-
+//                removeDuplicate(s2);
+            } else {
+//                System.out.println("S1 >= s2");
+//                hasmore1= s1.next(); ////////to add this lin for the case when s1==s2
+                currentscan = s2;
             }
         } else if (hasmore1) {
+//            System.out.println("In the no dups sort scan "+ s1.getVal("Sname"));
             currentscan = s1;
         } else if (hasmore2) {
+//            System.out.println("In the no dups sort scan "+ s2.getVal("Sname"));
             currentscan = s2;
         }
         return true;
