@@ -53,17 +53,17 @@ public class NoDupsSortScan implements Scan {
 //            System.out.println("In the no dups sort scan "+ s1.getVal("Sname")+ " "+ s2.getVal("Sname"));
             if (comp.compare(s1, s2) < 0) {
                 currentscan = s1;
-            } else if (comp.compare(s1, s2) == 0) {
-//                System.out.println("Here we have equality: " + " "
-//                        + s1.getInt("SId") + " "
-//                        + s1.getString("Sname") + " "
-//                        + s2.getInt("SId") + " "
-//                        + s2.getString("Sname"));
-                s1.next();
-                currentscan = s2;
-//                removeDuplicate(s2);
+//            } else if (comp.compare(s1, s2) == 0) {
+////                System.out.println("Here we have equality: " + " "
+////                        + s1.getInt("SId") + " "
+////                        + s1.getString("Sname") + " "
+////                        + s2.getInt("SId") + " "
+////                        + s2.getString("Sname"));
+//                s1.next();
+//                currentscan = s2;
+////                removeDuplicate(s2);
             } else {
-                s1.next();
+                hasmore1= s1.next();
                 currentscan = s2;
 
             }
