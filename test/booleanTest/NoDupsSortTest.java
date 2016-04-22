@@ -47,13 +47,13 @@ public class NoDupsSortTest {
 
     //Sort (filter) elems in table based on curent fields
     private static String distinctFilter = "Sname";
-    private static List<String> filterOn = Arrays.asList( distinctFilter );
-    
+    private static List<String> filterOn = Arrays.asList(distinctFilter);
+
     //Actual scanner
     private static NoDupsSortScan noDupsSortScan;
 
     //Sorted values (for testing)
-    private static List<String> sortedNames = Arrays.asList("Boyko", "Artur", "Cada", "Mada", "Vada");
+    private static List<String> sortedNames = Arrays.asList("A", "B", "C", "D", "E", "F", "G");
 
     @BeforeClass
     public static void setUpClass() {
@@ -85,28 +85,48 @@ public class NoDupsSortTest {
 
         file.insert();
         file.setInt("SId", 1);
-        file.setString("Sname", "Boyko");
-
-        file.insert();
-        file.setInt("SId", 2);
-        file.setString("Sname", "Boyko");
+        file.setString("Sname", "A");
 
         file.insert();
         file.setInt("SId", 1);
-        file.setString("Sname", "Artur");
+        file.setString("Sname", "B");
 
         file.insert();
         file.setInt("SId", 1);
-        file.setString("Sname", "Mada");
+        file.setString("Sname", "C");
+
+        file.insert();
+        file.setInt("SId", 12);
+        file.setString("Sname", "D");
 
         file.insert();
         file.setInt("SId", 5);
-        file.setString("Sname", "Cada");
+        file.setString("Sname", "E");
+       
+        file.insert();
+        file.setInt("SId", 190);
+        file.setString("Sname", "C");
 
         file.insert();
-        file.setInt("SId", 2);
-        file.setString("Sname", "Vada");
+        file.setInt("SId", 18);
+        file.setString("Sname", "B");
+//
+        file.insert();
+        file.setInt("SId", 5);
+        file.setString("Sname", "A");
+//
+        file.insert();
+        file.setInt("SId", 12);
+        file.setString("Sname", "F");
 
+        file.insert();
+        file.setInt("SId", 1);
+        file.setString("Sname", "G");
+
+         file.insert();
+         file.setInt("SId", 2);
+         file.setString("Sname", "B");
+         
         //commit
         transaction.commit();
     }
@@ -136,10 +156,12 @@ public class NoDupsSortTest {
         //Loop through group by scan results
         int loopId = 0;
         while (noDupsSortScan.next()) {
-            System.out.println("Comparing DB : '" + sortedNames.get(loopId) + "' vs Local : '" + noDupsSortScan.getVal("Sname") + "'");
+            System.out.println("Comparing DB : '" + noDupsSortScan.getVal("Sname"));
 
             assertEquals(sortedNames.get(loopId), noDupsSortScan.getString("Sname"));
             loopId++;
         }
+//        assertEquals(1, 1);
+//        System.out.println("loopid: " + loopId);
     }
 }

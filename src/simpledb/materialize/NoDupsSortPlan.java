@@ -26,6 +26,7 @@ public class NoDupsSortPlan implements Plan {
         Scan src = p.open();
         List<TempTable> runs = splitIntoRuns(src);
         src.close();
+        System.out.println("Runs size: " + runs.size());
         while (runs.size() > 2) {
             runs = doAMergeIteration(runs);
         }
@@ -50,7 +51,8 @@ public class NoDupsSortPlan implements Plan {
         return sch;
     }
 
-    private List<TempTable> splitIntoRuns(Scan scan) {
+    private List<TempTable> splitIntoRuns(Scan scan1) {
+        UpdateScan scan = (UpdateScan) scan1;
         List<TempTable> temps = new ArrayList<TempTable>();
         scan.beforeFirst();
         if (!scan.next()) {
@@ -66,15 +68,30 @@ public class NoDupsSortPlan implements Plan {
             value = comp.compare(scan, currentScan);
 
             if (value < 0) {
+//                System.out.println("The value is < 0. The values are: "
+//                        + scan.getString("Sname")
+//                        + " "
+//                        + currentScan.getString("Sname"));
                 currentScan.close();
                 currenttemp = new TempTable(sch, tx);
                 temps.add(currenttemp);
                 currentScan = (UpdateScan) currenttemp.open();
 
             } else if (value == 0) {
+//                System.out.println("The value is 0. The values are: "
+//                        + scan.getString("Sname")
+//                        + " "
+//                        + currentScan.getString("Sname"));
+                currentScan.delete();
                 //If they are equal, just skip and continue to the next one
-                currentScan = (UpdateScan) currenttemp.open();
-                scan.next();
+//                currentScan.close();
+//                currentScan = (UpdateScan) currenttemp.open();
+//                scan.next();
+            } else {
+//                System.out.println("The value is > 0. The values are: "
+//                        + scan.getString("Sname")
+//                        + " "
+//                        + currentScan.getString("Sname"));
             }
         }
         currentScan.close();
@@ -95,8 +112,8 @@ public class NoDupsSortPlan implements Plan {
     }
 
     private TempTable mergeTwoRuns(TempTable p1, TempTable p2) {
-        Scan src1 = p1.open();
-        Scan src2 = p2.open();
+        UpdateScan src1 = (UpdateScan) p1.open();
+        UpdateScan src2 = (UpdateScan) p2.open();
         TempTable result = new TempTable(sch, tx);
         UpdateScan dest = result.open();
 
@@ -104,15 +121,25 @@ public class NoDupsSortPlan implements Plan {
         boolean hasmore2 = src2.next();
         int value = 0;
         while (hasmore1 && hasmore2) {
-
             value = comp.compare(src1, src2);
-
+//            System.out.println("1st run: "
+//                    + src1.getVal("Sname")
+//                    + " vs 2nd run: "
+//                    + src2.getVal("Sname")
+//                    + "Value "
+//                    + value);
             if (value != 0) {
                 if (value < 0) {
                     hasmore1 = copy(src1, dest);
                 } else {
                     hasmore2 = copy(src2, dest);
                 }
+            } else {
+//                System.out.println("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP "
+//                        + "Src1: " + src1.getString("Sname") + " Src2: " + src2.getString("Sname"));
+                hasmore1 = src1.next();
+                src2.delete();
+
             }
         }
 
