@@ -24,7 +24,7 @@ public class NoDupsSortPlan implements Plan {
 
     public Scan open() {
         Scan src = p.open();
-        List<TempTable> runs = splitIntoRuns(src);
+        List<TempTable> runs = splitIntoRunsHashing(src);//it can be changed to splitIntoRuns(src)
         src.close();
         while (runs.size() > 2) {
             runs = doAMergeIteration(runs);
@@ -48,6 +48,38 @@ public class NoDupsSortPlan implements Plan {
 
     public Schema schema() {
         return sch;
+    }
+
+    private List<TempTable> splitIntoRunsHashing(Scan scan1) {
+        UpdateScan scan = (UpdateScan) scan1;
+        List<TempTable> temps = new ArrayList<TempTable>();
+        scan.beforeFirst();
+        if (!scan.next()) {
+            return temps;
+        }
+        TempTable currenttemp = new TempTable(sch, tx);
+        temps.add(currenttemp);
+        UpdateScan currentScan = currenttemp.open();
+        int value = 0;
+        int i;
+        while (copy(scan, currentScan)) {
+            i = 0;
+            while (i < 5 && scan.getString("Sname").length() > i) {
+                value += ("" + scan.getString("Sname").charAt(i)).compareTo("m");
+                i++;
+            }
+            if (value < 0) {
+                currentScan.close();
+                currenttemp = new TempTable(sch, tx);
+                temps.add(currenttemp);
+                currentScan = (UpdateScan) currenttemp.open();
+
+            } else {
+                currentScan.delete();
+            }
+        }
+        currentScan.close();
+        return temps;
     }
 
     private List<TempTable> splitIntoRuns(Scan scan1) {

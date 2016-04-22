@@ -51,7 +51,7 @@ public class NoDupsSortTest {
     private static NoDupsSortScan noDupsSortScan;
 
     //Sorted values (for testing)
-    private static List<String> sortedNames = Arrays.asList( "A", "B", "C", "D", "E", "F", "G" );
+    private static List<String> sortedNames = Arrays.asList( "AMMMMM", "BZZZZZ", "CEEEEE", "DNNNNN", "EOOOOO", "FLLLLL", "GGGGGG" );
 
     @BeforeClass
     public static void setUpClass() {
@@ -83,47 +83,47 @@ public class NoDupsSortTest {
 
         file.insert();
         file.setInt( "SId", 1 );
-        file.setString( "Sname", "A" );
+        file.setString( "Sname", "AMMMMM" );
 
         file.insert();
         file.setInt( "SId", 2 );
-        file.setString( "Sname", "B" );
+        file.setString( "Sname", "BZZZZZ" );
 
         file.insert();
         file.setInt( "SId", 3 );
-        file.setString( "Sname", "C" );
+        file.setString( "Sname", "CEEEEE" );
 
         file.insert();
         file.setInt( "SId", 4 );
-        file.setString( "Sname", "D" );
+        file.setString( "Sname", "DNNNNN" );
 
         file.insert();
         file.setInt( "SId", 5 );
-        file.setString( "Sname", "E" );
+        file.setString( "Sname", "EOOOOO" );
 
         file.insert();
         file.setInt( "SId", 6 );
-        file.setString( "Sname", "C" );
+        file.setString( "Sname", "CEEEEE" );
 
         file.insert();
         file.setInt( "SId", 7 );
-        file.setString( "Sname", "B" );
+        file.setString( "Sname", "BZZZZZ" );
 
         file.insert();
         file.setInt( "SId", 8 );
-        file.setString( "Sname", "A" );
+        file.setString( "Sname", "AMMMMM" );
 
         file.insert();
         file.setInt( "SId", 9 );
-        file.setString( "Sname", "F" );
+        file.setString( "Sname", "FLLLLL" );
 
         file.insert();
         file.setInt( "SId", 10 );
-        file.setString( "Sname", "G" );
+        file.setString( "Sname", "GGGGGG" );
 
         file.insert();
         file.setInt( "SId", 11 );
-        file.setString( "Sname", "B" );
+        file.setString( "Sname", "BZZZZZ" );
 
         //commit
         transaction.commit();
