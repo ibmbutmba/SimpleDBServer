@@ -3,11 +3,9 @@ package booleanTest;
 import java.io.IOException;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import simpledb.metadata.TableMgr;
 import simpledb.query.TableScan;
 import simpledb.record.RecordFile;
 import simpledb.record.Schema;
@@ -15,10 +13,6 @@ import simpledb.record.TableInfo;
 import simpledb.server.SimpleDB;
 import simpledb.tx.Transaction;
 
-/**
- *
- * @author artur
- */
 public class NewDataTypesTest {
 
     static Transaction tx;
@@ -27,9 +21,6 @@ public class NewDataTypesTest {
     private TableInfo ti;
     private TableScan ts;
     private static Schema schema;
-
-    public NewDataTypesTest() {
-    }
 
     @BeforeClass
     public static void setUpClass() {
@@ -58,9 +49,6 @@ public class NewDataTypesTest {
     @AfterClass
     public static void tearDownClass() throws IOException {
         SimpleDB.dropDatabase(dbName);
-    }
-
-    public void setUp() {
     }
 
     @After
