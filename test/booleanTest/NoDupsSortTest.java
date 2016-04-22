@@ -52,7 +52,7 @@ public class NoDupsSortTest {
 
     //Sorted values (for testing)
     private static List<String> sortedNames = Arrays.asList( "A", "B", "C", "D", "E", "F", "G" );
-    
+
     @BeforeClass
     public static void setUpClass() {
         //Init connection with db
@@ -80,47 +80,47 @@ public class NoDupsSortTest {
 
         //Init group by plan
         noDupsSortPlan = new NoDupsSortPlan( selectPlan, filterOn, transaction );
-        
+
         file.insert();
         file.setInt( "SId", 1 );
         file.setString( "Sname", "A" );
-        
+
         file.insert();
         file.setInt( "SId", 2 );
         file.setString( "Sname", "B" );
-        
+
         file.insert();
         file.setInt( "SId", 3 );
         file.setString( "Sname", "C" );
-        
+
         file.insert();
         file.setInt( "SId", 4 );
         file.setString( "Sname", "D" );
-        
+
         file.insert();
         file.setInt( "SId", 5 );
         file.setString( "Sname", "E" );
-        
+
         file.insert();
         file.setInt( "SId", 6 );
         file.setString( "Sname", "C" );
-        
+
         file.insert();
         file.setInt( "SId", 7 );
         file.setString( "Sname", "B" );
-//
+
         file.insert();
         file.setInt( "SId", 8 );
         file.setString( "Sname", "A" );
-//
+
         file.insert();
         file.setInt( "SId", 9 );
         file.setString( "Sname", "F" );
-        
+
         file.insert();
         file.setInt( "SId", 10 );
         file.setString( "Sname", "G" );
-        
+
         file.insert();
         file.setInt( "SId", 11 );
         file.setString( "Sname", "B" );
@@ -128,21 +128,21 @@ public class NoDupsSortTest {
         //commit
         transaction.commit();
     }
-    
+
     @AfterClass
     public static void tearDownClass() throws IOException {
         SimpleDB.dropDatabase( dbName );
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
         transaction.commit();
     }
-    
+
     @Test
     public void testGroupBy() {
         //Open
@@ -155,7 +155,7 @@ public class NoDupsSortTest {
         int loopId = 0;
         while ( noDupsSortScan.next() ) {
             System.out.println( "Comparing DB : '" + noDupsSortScan.getVal( "Sname" ) + "' vs Predictions : '" + sortedNames.get( loopId ) + "'" );
-            
+
             assertEquals( sortedNames.get( loopId ), noDupsSortScan.getString( "Sname" ) );
             loopId++;
         }
