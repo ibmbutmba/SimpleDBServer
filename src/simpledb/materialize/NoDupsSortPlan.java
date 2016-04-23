@@ -24,8 +24,10 @@ public class NoDupsSortPlan implements Plan {
 
     public Scan open() {
         Scan src = p.open();
-        List<TempTable> runs = splitIntoRuns(src);
+//        List<TempTable> runs = splitIntoRuns(src);
+        List<TempTable> runs = splitIntoRunsHashing(src);//it can be changed to splitIntoRuns(src)
         src.close();
+        System.out.println("Runs size: " + runs.size());
         while (runs.size() > 2) {
             runs = doAMergeIteration(runs);
         }
@@ -50,6 +52,73 @@ public class NoDupsSortPlan implements Plan {
         return sch;
     }
 
+    private List<TempTable> splitIntoRunsHashing(Scan scan1) {
+        UpdateScan scan = (UpdateScan) scan1;
+        List<TempTable> temps = new ArrayList<TempTable>();
+        TempTable temp1 = new TempTable(sch, tx);
+        TempTable temp2 = new TempTable(sch, tx);
+        scan.beforeFirst();
+        if (!scan.next()) {
+            return temps;
+        }
+        temps.add(temp1);
+        temps.add(temp2);
+
+        int value = 0;
+        int i = 0;
+        ArrayList<Constant> temp1Values = new ArrayList();
+        ArrayList<Constant> temp2Values = new ArrayList();
+
+        HashMap<String, Integer> hmap = new HashMap<String, Integer>();
+        hmap.put("a", 1);
+        hmap.put("b", 2);
+        hmap.put("c", 3);
+        hmap.put("d", 4);
+        hmap.put("e", 5);
+        hmap.put("f", 6);
+        hmap.put("g", 7);
+        hmap.put("h", 8);
+        hmap.put("i", 9);
+        hmap.put("j", 10);
+        hmap.put("k", 11);
+        hmap.put("l", 12);
+        hmap.put("m", 13);
+        hmap.put("n", 14);
+        hmap.put("o", 15);
+        hmap.put("p", 16);
+        hmap.put("q", 17);
+        hmap.put("r", 18);
+        hmap.put("s", 19);
+        hmap.put("t", 20);
+        hmap.put("u", 21);
+        hmap.put("v", 22);
+        hmap.put("w", 23);
+        hmap.put("x", 24);
+        hmap.put("y", 25);
+        hmap.put("z", 26);
+
+        //calculates the distance between each of the first 5 letters and "m"
+        //calculates the sum of these values
+        //uses this sum for splitting the values in 2 runs
+        while (i < 5 && scan.getString("Sname").length() > i) {
+            value += hmap.get(("" + (scan.getString("Sname").charAt(i))).toLowerCase());
+            i++;
+            if (i == 5) {
+                addtoTemp(value, scan, temp1Values, temp2Values);
+                i = 0;
+                value = 0;
+                if (!scan.next()) {
+                    break;
+                }
+            }
+        }
+
+        setValues(temp1, temp1Values);
+        setValues(temp2, temp2Values);
+
+        return temps;
+    }
+
     private List<TempTable> splitIntoRuns(Scan scan1) {
         UpdateScan scan = (UpdateScan) scan1;
         List<TempTable> temps = new ArrayList<TempTable>();
@@ -67,30 +136,13 @@ public class NoDupsSortPlan implements Plan {
             value = comp.compare(scan, currentScan);
 
             if (value < 0) {
-//                System.out.println("The value is < 0. The values are: "
-//                        + scan.getString("Sname")
-//                        + " "
-//                        + currentScan.getString("Sname"));
                 currentScan.close();
                 currenttemp = new TempTable(sch, tx);
                 temps.add(currenttemp);
                 currentScan = (UpdateScan) currenttemp.open();
-
             } else if (value == 0) {
-//                System.out.println("The value is 0. The values are: "
-//                        + scan.getString("Sname")
-//                        + " "
-//                        + currentScan.getString("Sname"));
-                currentScan.delete();
                 //If they are equal, just skip and continue to the next one
-//                currentScan.close();
-//                currentScan = (UpdateScan) currenttemp.open();
-//                scan.next();
-            } else {
-//                System.out.println("The value is > 0. The values are: "
-//                        + scan.getString("Sname")
-//                        + " "
-//                        + currentScan.getString("Sname"));
+                currentScan.delete();
             }
         }
         currentScan.close();
@@ -121,12 +173,6 @@ public class NoDupsSortPlan implements Plan {
         int value = 0;
         while (hasmore1 && hasmore2) {
             value = comp.compare(src1, src2);
-//            System.out.println("1st run: "
-//                    + src1.getVal("Sname")
-//                    + " vs 2nd run: "
-//                    + src2.getVal("Sname")
-//                    + "Value "
-//                    + value);
             if (value != 0) {
                 if (value < 0) {
                     hasmore1 = copy(src1, dest);
@@ -134,11 +180,8 @@ public class NoDupsSortPlan implements Plan {
                     hasmore2 = copy(src2, dest);
                 }
             } else {
-//                System.out.println("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP "
-//                        + "Src1: " + src1.getString("Sname") + " Src2: " + src2.getString("Sname"));
                 hasmore1 = src1.next();
                 src2.delete();
-
             }
         }
 
@@ -166,5 +209,42 @@ public class NoDupsSortPlan implements Plan {
             newUpdateScanObject.setVal(fldname, scan.getVal(fldname));
         }
         return scan.next();
+    }
+
+    //the minimum sum is 0 and the maximum is 130; we make 2 runs that have approximately the same size by comparing the value with 65
+    private void addtoTemp(int value, UpdateScan scan, ArrayList<Constant> temp1Values, ArrayList<Constant> temp2Values) {
+        boolean existing = false;
+        if (value < 65) {
+            for (Constant cons : temp1Values) {
+                if (scan.getVal("Sname").equals(cons)) {
+                    existing = true;
+                }
+            }
+            if (!existing) {
+                temp1Values.add(scan.getVal("Sname"));
+            }
+            existing = false;
+        } else {
+            for (Constant cons : temp2Values) {
+                if (scan.getVal("Sname").equals(cons)) {
+                    existing = true;
+                }
+            }
+            if (!existing) {
+                temp2Values.add(scan.getVal("Sname"));
+            }
+            existing = false;
+        }
+    }
+
+    private void setValues(TempTable temp1, ArrayList<Constant> namesList) {
+        UpdateScan updateScan1 = temp1.open();
+        for (Constant actualScan : namesList) {
+            updateScan1.insert();
+//            for (String fldname : sch.fields()) {
+            updateScan1.setVal("Sname", actualScan);
+//            }
+        }
+        updateScan1.close();
     }
 }
