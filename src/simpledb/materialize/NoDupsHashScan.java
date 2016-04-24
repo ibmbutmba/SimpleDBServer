@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package simpledb.materialize;
 
 import java.util.Arrays;
@@ -7,7 +12,11 @@ import simpledb.query.Scan;
 import simpledb.query.UpdateScan;
 import simpledb.record.RID;
 
-public class NoDupsSortScan implements Scan {
+/**
+ *
+ * @author mady
+ */
+public class NoDupsHashScan implements Scan {
 
     private List<String> indices;
     private GroupValue groupval;
@@ -17,7 +26,7 @@ public class NoDupsSortScan implements Scan {
     private UpdateScan s1, s2 = null, currentscan = null;
     private List<RID> savedposition;
 
-    public NoDupsSortScan( List<TempTable> runs, RecordComparator comp ) {
+    public NoDupsHashScan( List<TempTable> runs, RecordComparator comp ) {
 
         this.indices = indices;
         this.comp = comp;
@@ -50,10 +59,25 @@ public class NoDupsSortScan implements Scan {
         if ( !hasmore1 && !hasmore2 ) {
             return false;
         } else if ( hasmore1 && hasmore2 ) {
+//            System.out.println("In the no dups sort scan "+ s1.getVal("Sname")+ " "+ s2.getVal("Sname"));
             if ( comp.compare( s1, s2 ) < 0 ) {
                 currentscan = s1;
+//            } else if (comp.compare(s1, s2) == 0) {
+////                System.out.println("Here we have equality: " + " "
+////                        + s1.getInt("SId") + " "
+////                        + s1.getString("Sname") + " "
+////                        + s2.getInt("SId") + " "
+////                        + s2.getString("Sname"));
+//                s1.next();
+//                currentscan = s2;
+////                removeDuplicate(s2);
             } else {
+                //Part of head
                 hasmore1= s1.next();
+                //Dev2
+//                System.out.println("S1 >= s2");
+//                hasmore1= s1.next(); ////////to add this lin for the case when s1==s2
+
                 currentscan = s2;
             }
         } else if ( hasmore1 ) {
