@@ -11,6 +11,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import simpledb.materialize.AggregationFn;
+import simpledb.materialize.NoDupsHashPlan;
+import simpledb.materialize.NoDupsHashScan;
 import simpledb.materialize.NoDupsSortPlan;
 import simpledb.materialize.NoDupsSortScan;
 import simpledb.query.Plan;
@@ -35,6 +37,7 @@ public class NoDupsSortTest {
 
     //Planner componenets
     private static NoDupsSortPlan noDupsSortPlan;
+    private static NoDupsHashPlan noDupsHashPlan;
     private static SelectPlan selectPlan;
     private static Plan tablePlan;
 
@@ -47,11 +50,12 @@ public class NoDupsSortTest {
     private static String distinctFilter = "Sname";
     private static List<String> filterOn = Arrays.asList(distinctFilter);
 
-    //Actual scanner
+    //Actual scanners
     private static NoDupsSortScan noDupsSortScan;
+    private static NoDupsHashScan noDupsHashScan;
 
     //Sorted values (for testing)S
-    private static List<String> sortedNames = Arrays.asList( "AAAAA", "BBBBB", "CCCCC", "DDDDD", "EEEEE", "FFFFF", "GGGGG" );
+    private static List<String> sortedNames = Arrays.asList("AAAAA", "BBBBB", "CCCCC", "DDDDD", "EEEEE", "FFFFF", "GGGGG");
 
     @BeforeClass
     public static void setUpClass() {
@@ -79,47 +83,48 @@ public class NoDupsSortTest {
         selectPlan = new SelectPlan(tablePlan, predicate);
 
         //Init group by plan
-        noDupsSortPlan = new NoDupsSortPlan( selectPlan, filterOn, transaction );
+        noDupsSortPlan = new NoDupsSortPlan(selectPlan, filterOn, transaction);
+        noDupsHashPlan = new NoDupsHashPlan(selectPlan, filterOn, transaction);
 
         file.insert();
-        file.setInt( "SId", 1 );
-        file.setString( "Sname", "AAAAA" );
+        file.setInt("SId", 1);
+        file.setString("Sname", "AAAAA");
 
         file.insert();
-        file.setInt( "SId", 2 );
-        file.setString( "Sname", "BBBBB" );
+        file.setInt("SId", 2);
+        file.setString("Sname", "BBBBB");
 
         file.insert();
-        file.setInt( "SId", 3 );
-        file.setString( "Sname", "CCCCC" );
+        file.setInt("SId", 3);
+        file.setString("Sname", "CCCCC");
 
         file.insert();
-        file.setInt( "SId", 4 );
-        file.setString( "Sname", "DDDDD" );
+        file.setInt("SId", 4);
+        file.setString("Sname", "DDDDD");
 
         file.insert();
-        file.setInt( "SId", 5 );
-        file.setString( "Sname", "EEEEE" );
-        
-        file.insert();
-        file.setInt( "SId", 6 );
-        file.setString( "Sname", "CCCCC" );
+        file.setInt("SId", 5);
+        file.setString("Sname", "EEEEE");
 
         file.insert();
-        file.setInt( "SId", 7 );
-        file.setString( "Sname", "BBBBB" );
+        file.setInt("SId", 6);
+        file.setString("Sname", "CCCCC");
 
         file.insert();
-        file.setInt( "SId", 8 );
-        file.setString( "Sname", "AAAAA" );
+        file.setInt("SId", 7);
+        file.setString("Sname", "BBBBB");
 
         file.insert();
-        file.setInt( "SId", 9 );
-        file.setString( "Sname", "FFFFF" );
+        file.setInt("SId", 8);
+        file.setString("Sname", "AAAAA");
 
         file.insert();
-        file.setInt( "SId", 10 );
-        file.setString( "Sname", "GGGGG" );
+        file.setInt("SId", 9);
+        file.setString("Sname", "FFFFF");
+
+        file.insert();
+        file.setInt("SId", 10);
+        file.setString("Sname", "GGGGG");
 
         file.insert();
         file.setInt("SId", 11);
@@ -148,7 +153,7 @@ public class NoDupsSortTest {
     }
 
     @Test
-    public void testGroupBy() {
+    public void testSort() {
         //Open
         noDupsSortScan = (NoDupsSortScan) noDupsSortPlan.open();
 
@@ -157,10 +162,28 @@ public class NoDupsSortTest {
 
 //        Loop through group by scan results
         int loopId = 0;
-        while ( noDupsSortScan.next() ) {
-            System.out.println( "Comparing DB : '" + noDupsSortScan.getVal( "Sname" ) + "' vs Predictions : '" + sortedNames.get( loopId ) + "'" );
+        while (noDupsSortScan.next()) {
+            System.out.println("Comparing DB : '" + noDupsSortScan.getVal("Sname") + "' vs Predictions : '" + sortedNames.get(loopId) + "'");
 
-            assertEquals( sortedNames.get( loopId ), noDupsSortScan.getString( "Sname" ) );
+            assertEquals(sortedNames.get(loopId), noDupsSortScan.getString("Sname"));
+            loopId++;
+        }
+    }
+
+    @Test
+    public void testHash() {
+        //Open
+        noDupsHashScan = (NoDupsHashScan) noDupsHashPlan.open();
+
+        //Go to 1st
+        noDupsHashScan.beforeFirst();
+
+//        Loop through group by scan results
+        int loopId = 0;
+        while (noDupsHashScan.next()) {
+            System.out.println("Comparing DB : '" + noDupsHashScan.getVal("Sname") + "' vs Predictions : '" + sortedNames.get(loopId) + "'");
+
+            assertEquals(sortedNames.get(loopId), noDupsHashScan.getString("Sname"));
             loopId++;
         }
     }
