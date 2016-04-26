@@ -114,7 +114,7 @@ public class NoDupsHashPlan implements Plan {
         hmap.put("y", 25);
         hmap.put("z", 26);
 
-        //calculates the distance between each of the first 5 letters and "m"
+        //calculates the position in the alphabet of the first 5 letters
         //calculates the sum of these values
         //uses this sum for splitting the values in 2 runs
         while (i < 5 && scan.getString("Sname").length() > i) {
