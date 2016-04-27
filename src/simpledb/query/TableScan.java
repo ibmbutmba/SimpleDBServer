@@ -69,12 +69,12 @@ public class TableScan implements UpdateScan {
 
     public boolean getBoolean(String fldname) {
         System.out.println("query.Tablescan says : getBoolean( String : " + fldname + " )");
-        boolean pinkColor = true;
+        boolean boolValue = true;
         int valueBack = getInt(fldname);
         if (valueBack == 0) {
-            pinkColor = false;
+            boolValue = false;
         }
-        return pinkColor;
+        return boolValue;
     }
 
     public float getFloat(String fldname) {      
