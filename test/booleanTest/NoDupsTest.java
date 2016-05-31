@@ -55,7 +55,7 @@ public class NoDupsTest {
     private static NoDupsHashScan noDupsHashScan;
 
     //Sorted values (for testing)S
-    private static List<String> sortedNames = Arrays.asList( "AAAAA", "BBBBB", "CCCCC", "DDDDD", "EEEEE", "FFFFF", "GGGGG", "Mambo Numba 5" );
+    private static List<String> sortedNames = Arrays.asList( "AAAAA", "BBBBB", "CCCCC", "DDDDD", "EEEEE", "FFFFF", "GGGGG", "MamboNumba" );
 
     @BeforeClass
     public static void setUpClass() {
@@ -150,7 +150,7 @@ public class NoDupsTest {
         file.insert();
         file.setInt( "SId", 9 );
         file.setString( "Genre", "F" );
-        file.setString( "Sname", "Mambo Numba 5" );
+        file.setString( "Sname", "MamboNumba" );
 
         //commit
         transaction.commit();
